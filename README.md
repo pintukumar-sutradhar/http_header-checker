@@ -95,7 +95,7 @@ full cancellation support.
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-username>/http_header-checker.git
+git clone https://github.com/pintukumar-sutradhar/http_header-checker.git
 cd http_header-checker
 
 # 2. (Recommended) Create a virtual environment
