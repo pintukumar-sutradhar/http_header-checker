@@ -1,45 +1,34 @@
+<div align="center">
+
 # HTTP Header Checker
 
-A fast, local-first analyzer for HTTP security headers, TLS/certificate
-posture, cookies and redirect chains — with a clean CLI and a local web
-dashboard.
+**Fast, local-first security analysis of HTTP headers, TLS, cookies and redirect chains.**
 
-Built for developers, security engineers and auditors who want to answer one
-question clearly: *what is this site missing, why does it matter, and how do
-I fix it?*
+A clean CLI and a local web dashboard. No accounts, no telemetry, no data leaves your machine.
 
-![Dashboard](screenshots/screenshot_dashboard.png)
+[Features](#features) · [Installation](#installation) · [Usage](#usage) · [Development](#development)
 
-## Why this tool
+<img src="screenshots/screenshot_dashboard.png" alt="Header Checker dashboard" width="820">
 
-Most scanners bury you in jargon and arbitrary numbers. This tool is built
-on three principles:
+</div>
 
-1. **No noise.** Informational observations never masquerade as findings.
-   The findings register only contains actionable issues with severities,
-   impact and concrete remediation.
-2. **Plain language.** Header verdicts are Pass / Warning / Fail / Info —
-   each with a one-line explanation of what it means for you.
-3. **Local-first.** Everything runs on your machine; no accounts, no
-   telemetry, no data leaving your network.
+---
 
 ## Features
 
-- **45+ HTTP headers evaluated** against OWASP / Mozilla guidance, including
-  HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy,
-  Permissions-Policy and the Cross-Origin isolation headers
-- **CSP analysis** — parses directives, flags `unsafe-inline`, wildcards,
-  `data:` URIs and structural gaps
-- **Cookie analysis** — Secure / HttpOnly / SameSite flags, session-cookie
-  risk detection across the whole redirect chain
-- **TLS & certificate inspection** — protocol, cipher suite, expiry countdown,
-  SANs, self-signed / hostname-mismatch / weak-crypto detection
-- **Redirect chain analysis** — HTTPS downgrade, loops, excessive hops
-- **Passive technology fingerprinting** — server, CDN, framework, CMS
-- **JSON + standalone HTML reports** for documentation and pipelines
-- **CI gate mode** — fail your pipeline when findings meet a severity threshold
+| | |
+|---|---|
+| **Security headers** | 45+ headers evaluated against OWASP / Mozilla guidance — HSTS, CSP, X-Frame-Options, Referrer-Policy, Permissions-Policy and more |
+| **CSP deep analysis** | Parses directives; flags `unsafe-inline`, wildcards, `data:` URIs and structural gaps |
+| **Cookies** | Secure / HttpOnly / SameSite flags and session-cookie risk across the entire redirect chain |
+| **TLS & certificates** | Protocol, cipher suite, expiry countdown, SANs, self-signed / hostname-mismatch / weak-crypto detection |
+| **Redirects** | HTTPS downgrade, loops, excessive hops |
+| **Fingerprinting** | Passive detection of server, CDN, framework and CMS |
+| **Reports** | JSON and standalone HTML exports for documentation and pipelines |
+| **CI gate mode** | Fails your pipeline when findings meet a severity threshold |
 
-![Scan results](screenshots/screenshot_results.png)
+Findings are severity-ranked with impact and concrete remediation — no scores,
+no jargon, no noise.
 
 ## Installation
 
@@ -48,20 +37,16 @@ Requires Python 3.10+.
 ```bash
 git clone https://github.com/pintukumar-sutradhar/http_header-checker.git
 cd http_header-checker
-
-python3 -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
-
 pip install .
 ```
 
-Or install straight from GitHub:
+Or directly:
 
 ```bash
 pip install git+https://github.com/pintukumar-sutradhar/http_header-checker.git
 ```
 
-No compilers, no Qt system libraries, no browser extensions — pure Python.
+Pure Python — no compilers, no system libraries.
 
 ## Usage
 
@@ -71,37 +56,24 @@ No compilers, no Qt system libraries, no browser extensions — pure Python.
 http-header-checker ui --open
 ```
 
-Opens `http://127.0.0.1:8765` in your browser. Enter a URL, click Scan.
-Runs entirely on localhost — no data leaves your machine.
-
+Opens `http://127.0.0.1:8765` in your browser. Enter a URL, click **Analyze**.
 Tip: append `?url=example.com` to auto-start a scan — handy for bookmarks.
 
 ### CLI
 
 ```bash
-# Basic scan with terminal summary
-http-header-checker scan https://example.com
-
-# Export reports
-http-header-checker scan example.com --json report.json --html report.html
-
-# CI gate: exit code 2 if any High-or-worse finding exists
-http-header-checker scan https://example.com --fail-on high
-
-# Common options
-http-header-checker scan example.com \
-    --method HEAD \
-    --timeout 10 \
-    --proxy http://127.0.0.1:8080 \
-    --verify-ssl \
-    --header "X-Request-Id: audit-42" \
-    --cookie "session=..." \
-    --random-ua
+http-header-checker scan https://example.com              # terminal summary
+http-header-checker scan example.com --html report.html   # standalone HTML report
+http-header-checker scan example.com --json report.json   # JSON export
+http-header-checker scan example.com --fail-on high       # exit 2 if High+ findings (CI gate)
 ```
+
+Common options: `--method HEAD` · `--timeout 10` · `--proxy http://127.0.0.1:8080`
+· `--verify-ssl` · `--header "X-Request-Id: audit-42"` · `--cookie "session=..."` · `--random-ua`
 
 Exit codes: `0` success · `1` scan failed · `2` findings met `--fail-on` gate.
 
-### Library use
+### Library
 
 ```python
 from header_checker.core.scan_engine import run_scan
@@ -113,17 +85,9 @@ for finding in result.findings:
     print(f"    Fix: {finding.remediation}")
 ```
 
-## Project structure
+## Screenshots
 
-```
-header_checker/
-├── core/            # scanning engine (pure logic, framework-free)
-├── web/             # local dashboard (FastAPI + single-page UI)
-├── utils/           # data models, constants, logging, networking
-├── cli.py           # command-line interface
-└── reporting.py     # JSON / HTML / text report rendering
-checks/              # verification suite (pytest, no network required)
-```
+<img src="screenshots/screenshot_results.png" alt="Scan results view" width="820">
 
 ## Development
 
@@ -133,23 +97,20 @@ pytest                           # runs the checks/ suite
 ruff check header_checker checks # lint
 ```
 
-To extend the tool, start with the module docstrings in
-`header_checker/core/header_definitions.py` (header knowledge base).
+To extend the knowledge base, start with the module docstring in
+`header_checker/core/header_definitions.py`.
 
-## Legal / ethical use
+## Legal
 
-This tool is intended **only** for authorized security testing — systems you
-own or have explicit written permission to assess. Scanning targets without
-authorization may violate computer misuse laws in your jurisdiction.
-The authors accept no liability for misuse.
+Intended **only** for authorized security testing — systems you own or have
+explicit written permission to assess. Unauthorized scanning may violate
+computer misuse laws in your jurisdiction. The authors accept no liability
+for misuse.
 
 ## License
 
 Released under the [MIT License](LICENSE).
 
-## Acknowledgements
-
-Guidance and reference material from
-[OWASP Secure Headers Project](https://owasp.org/www-project-secure-headers/),
-[MDN HTTP Headers documentation](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
-and the Mozilla HTTP Observatory.
+Guidance references: [OWASP Secure Headers Project](https://owasp.org/www-project-secure-headers/)
+· [MDN HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
+· [Mozilla HTTP Observatory](https://developer.mozilla.org/en-US/docs/observatory)
