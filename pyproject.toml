@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "http-header-checker"
+version = "2.0.0"
+description = "Professional HTTP security header, TLS/certificate, cookie and redirect analyzer with severity-ranked findings, a headless CLI and a local web dashboard."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Pintu Kumar Sutradhar" }]
+keywords = [
+    "security", "http", "headers", "csp", "hsts", "tls", "ssl",
+    "cookies", "scanner", "pentest", "owasp", "security-audit",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Environment :: Web Environment",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Topic :: Internet :: WWW/HTTP",
+]
+dependencies = [
+    "requests>=2.31",
+    "urllib3>=2.0",
+    "cryptography>=42.0",
+    "validators>=0.22",
+    "beautifulsoup4>=4.12",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+    "httpx>=0.27",
+]
+
+[project.urls]
+Homepage = "https://github.com/pintukumar-sutradhar/http_header-checker"
+Repository = "https://github.com/pintukumar-sutradhar/http_header-checker"
+Issues = "https://github.com/pintukumar-sutradhar/http_header-checker/issues"
+Changelog = "https://github.com/pintukumar-sutradhar/http_header-checker/blob/main/CHANGELOG.md"
+
+[project.scripts]
+http-header-checker = "header_checker.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["header_checker*"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = [
+    "E501",  # long lines allowed in report templates / UA strings
+]
+
+[tool.pytest.ini_options]
+testpaths = ["checks"]
+python_files = ["check_*.py"]
+addopts = "-q"
+
+[tool.coverage.run]
+source = ["header_checker/core", "header_checker/utils", "header_checker/reporting.py"]

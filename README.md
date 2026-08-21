@@ -1,187 +1,155 @@
 # HTTP Header Checker
 
-A professional, desktop-native **HTTP security header, TLS/certificate, cookie,
-redirect and technology fingerprinting analyzer** built with **Python 3** and
-**PySide6** — designed for penetration testers, red teamers, vulnerability
-assessment engineers, and security auditors.
+A fast, local-first analyzer for HTTP security headers, TLS/certificate
+posture, cookies and redirect chains — with a clean CLI and a local web
+dashboard.
 
-No Electron. No web app. No JavaScript. A fully native Qt desktop application
-with a modular, extensible, enterprise-grade architecture.
+Built for developers, security engineers and auditors who want to answer one
+question clearly: *what is this site missing, why does it matter, and how do
+I fix it?*
 
-![Dashboard](resources/screenshot_dashboard.png)
+![Dashboard](screenshots/screenshot_dashboard.png)
 
----
+## Why this tool
 
-## ✨ Features
+Most scanners bury you in jargon and arbitrary numbers. This tool is built
+on three principles:
 
-### 🔍 Comprehensive HTTP Header Analysis
-Checks 45+ modern and legacy HTTP headers, including all core security
-headers (`Strict-Transport-Security`, `Content-Security-Policy`,
-`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`,
-`Permissions-Policy`, `Cross-Origin-*-Policy`, etc.) as well as
-informational/fingerprinting headers (`Server`, `X-Powered-By`, `Via`,
-`Alt-Svc`, CORS headers, caching headers, and more).
+1. **No noise.** Informational observations never masquerade as findings.
+   The findings register only contains actionable issues with severities,
+   impact and concrete remediation.
+2. **Plain language.** Header verdicts are Pass / Warning / Fail / Info —
+   each with a one-line explanation of what it means for you.
+3. **Local-first.** Everything runs on your machine; no accounts, no
+   telemetry, no data leaving your network.
 
-For every header, the tool reports:
-- Status: **Present / Missing / Weak / Misconfigured / Deprecated**
-- Severity: **Critical / High / Medium / Low / Informational**
-- Current value vs. recommended secure value
-- Why it matters (business impact) + OWASP / Mozilla / Microsoft guidance
-- Example secure configuration
+## Features
 
-### 🧩 Content-Security-Policy (CSP) Analyzer
-Parses every CSP directive (`default-src`, `script-src`, `object-src`,
-`frame-ancestors`, `base-uri`, `upgrade-insecure-requests`, etc.), flags
-dangerous values (`unsafe-inline`, `unsafe-eval`, wildcard sources, `data:`
-URIs) and explains each issue.
+- **45+ HTTP headers evaluated** against OWASP / Mozilla guidance, including
+  HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy,
+  Permissions-Policy and the Cross-Origin isolation headers
+- **CSP analysis** — parses directives, flags `unsafe-inline`, wildcards,
+  `data:` URIs and structural gaps
+- **Cookie analysis** — Secure / HttpOnly / SameSite flags, session-cookie
+  risk detection across the whole redirect chain
+- **TLS & certificate inspection** — protocol, cipher suite, expiry countdown,
+  SANs, self-signed / hostname-mismatch / weak-crypto detection
+- **Redirect chain analysis** — HTTPS downgrade, loops, excessive hops
+- **Passive technology fingerprinting** — server, CDN, framework, CMS
+- **JSON + standalone HTML reports** for documentation and pipelines
+- **CI gate mode** — fail your pipeline when findings meet a severity threshold
 
-### 🍪 Cookie Security Analysis
-Parses every `Set-Cookie` header and detects missing `Secure` / `HttpOnly`
-flags, weak or missing `SameSite`, `SameSite=None` without `Secure`, and
-likely session/auth cookies lacking proper protections.
+![Scan results](screenshots/screenshot_results.png)
 
-### ↪️ Redirect Chain Analysis
-Follows and displays the full redirect chain, detecting HTTPS→HTTP
-downgrades, mixed-protocol hops, redirect loops, and excessive chain length.
+## Installation
 
-### 🔐 TLS / Certificate Analysis
-Performs an independent TLS handshake to report protocol version, cipher
-suite, certificate subject/issuer/SANs, expiry countdown, SHA-256
-fingerprint, public key type/size, self-signed/hostname-mismatch detection,
-weak cipher/protocol detection, and HSTS preload eligibility heuristics.
-
-### 🖥️ Server & Technology Fingerprinting
-Passively fingerprints web servers (Nginx, Apache, IIS, LiteSpeed, Caddy...),
-CDNs (Cloudflare, Fastly, CloudFront, Akamai...), reverse proxies,
-frameworks (Express, ASP.NET, Laravel...), and CMS platforms (WordPress,
-Drupal, Joomla) from headers, cookies, and page content — no intrusive
-probing.
-
-### ⚠️ Risk Scoring & Findings Register
-Every issue becomes a structured finding with severity, category, business
-impact, and remediation guidance. An overall **0–100 security score** with
-letter grade (A+ through F) is computed from all findings.
-
-### 🎛️ Advanced Scan Options
-Configurable HTTP method (GET/HEAD/OPTIONS), custom headers, Bearer token
-auth, cookies, HTTP(S)/SOCKS proxy, timeout & retries, follow/disable
-redirects, strict/relaxed SSL verification, User-Agent mode (default /
-random / custom), and IPv4/IPv6 resolution preferences.
-
-### 🧵 Fully Non-Blocking UI
-All scanning happens on a background `QThread` — the UI never freezes —
-with a live stage tracker (Resolving DNS → Connecting → TLS Handshake →
-Sending Request → Receiving Headers → Parsing → Analyzing → Completed) and
-full cancellation support.
-
----
-
-## 📸 Screenshots
-
-| Dashboard | Header Analysis | Findings & Risk |
-|---|---|---|
-| ![Dashboard](resources/screenshot_dashboard.png) | ![Headers](resources/screenshot_headers.png) | ![Findings](resources/screenshot_findings.png) |
-
-
----
-
-## 🚀 Installation
-
-### Requirements
-- Python 3.10+
-- pip
-
-### Steps
+Requires Python 3.10+.
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/pintukumar-sutradhar/http_header-checker.git
 cd http_header-checker
 
-# 2. (Recommended) Create a virtual environment
 python3 -m venv .venv
-source .venv/bin/activate      # Windows: .venv\Scripts\activate
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
 
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Run the application
-python main.py
+pip install .
 ```
 
-### Linux additional system libraries
-
-On minimal Linux distros/containers, Qt requires a few system libraries for
-the GUI to render:
+Or install straight from GitHub:
 
 ```bash
-sudo apt-get install -y libxkbcommon0 libxkbcommon-x11-0 libgl1 libegl1 \
-    libdbus-1-3 libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 \
-    libxcb-randr0 libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 \
-    libxcb-xkb1 libnss3 libxcomposite1 libxdamage1 libxrandr2 libasound2t64
+pip install git+https://github.com/pintukumar-sutradhar/http_header-checker.git
 ```
 
----
+No compilers, no Qt system libraries, no browser extensions — pure Python.
 
-## 📖 User Manual
+## Usage
 
-1. **Enter a target URL** (e.g. `https://example.com`) in the target field.
-   The scheme is optional — `https://` is assumed if omitted.
-2. Choose the HTTP method (**GET / HEAD / OPTIONS**) from the dropdown.
-3. Click **🔍 Check Headers** (or press `Enter`) to start the scan. The
-   stage tracker shows live progress; click **Cancel** to abort at any time.
-4. Once complete, explore the results across tabs:
-   - **📊 Dashboard** — network, TLS, and technology summary + overall score
-   - **🛡️ Headers** — full header checklist; double-click any row for deep
-     OWASP/Mozilla/Microsoft guidance
-   - **🧩 CSP Analyzer** — parsed CSP directives and dangerous-value warnings
-   - **🍪 Cookies** — per-cookie flag analysis (Secure/HttpOnly/SameSite/etc.)
-   - **↪️ Redirects** — full redirect chain with protocol/downgrade detection
-   - **🔐 TLS / Certificate** — handshake details & certificate chain info
-   - **🖥️ Fingerprint** — detected server, CDN, framework, CMS, technologies
-   - **⚠️ Findings & Risk** — consolidated, severity-ranked risk register
-5. Use **Tools → Advanced Scan Options** (`Ctrl+O`) to configure custom
-   headers, auth tokens, cookies, proxies, timeouts, redirect behavior, SSL
-   verification, and User-Agent strategy before your next scan.
-6. Use **Tools → Set Analyst Name** to label who performed the assessment.
+### Web dashboard
 
-### Keyboard Shortcuts
+```bash
+http-header-checker ui --open
+```
 
-| Shortcut | Action |
-|---|---|
-| `Ctrl+N` | New scan |
-| `Ctrl+O` | Advanced scan options |
-| `Ctrl+Q` | Quit |
-| `Enter` (in URL field) | Start scan |
+Opens `http://127.0.0.1:8765` in your browser. Enter a URL, click Scan.
+Runs entirely on localhost — no data leaves your machine.
 
----
+Tip: append `?url=example.com` to auto-start a scan — handy for bookmarks.
 
-## ⚠️ Legal / Ethical Use
+### CLI
 
-This tool is intended **only** for authorized security testing — on systems
-you own or have explicit written permission to assess. Scanning targets
-without authorization may violate computer misuse laws in your jurisdiction.
+```bash
+# Basic scan with terminal summary
+http-header-checker scan https://example.com
+
+# Export reports
+http-header-checker scan example.com --json report.json --html report.html
+
+# CI gate: exit code 2 if any High-or-worse finding exists
+http-header-checker scan https://example.com --fail-on high
+
+# Common options
+http-header-checker scan example.com \
+    --method HEAD \
+    --timeout 10 \
+    --proxy http://127.0.0.1:8080 \
+    --verify-ssl \
+    --header "X-Request-Id: audit-42" \
+    --cookie "session=..." \
+    --random-ua
+```
+
+Exit codes: `0` success · `1` scan failed · `2` findings met `--fail-on` gate.
+
+### Library use
+
+```python
+from header_checker.core.scan_engine import run_scan
+from header_checker.utils.models import ScanOptions
+
+result = run_scan("https://example.com", options=ScanOptions(method="HEAD"))
+for finding in result.findings:
+    print(f"[{finding.severity.value}] {finding.title}")
+    print(f"    Fix: {finding.remediation}")
+```
+
+## Project structure
+
+```
+header_checker/
+├── core/            # scanning engine (pure logic, framework-free)
+├── web/             # local dashboard (FastAPI + single-page UI)
+├── utils/           # data models, constants, logging, networking
+├── cli.py           # command-line interface
+└── reporting.py     # JSON / HTML / text report rendering
+checks/              # verification suite (pytest, no network required)
+```
+
+## Development
+
+```bash
+pip install -e ".[dev]"
+pytest                           # runs the checks/ suite
+ruff check header_checker checks # lint
+```
+
+To extend the tool, start with the module docstrings in
+`header_checker/core/header_definitions.py` (header knowledge base).
+
+## Legal / ethical use
+
+This tool is intended **only** for authorized security testing — systems you
+own or have explicit written permission to assess. Scanning targets without
+authorization may violate computer misuse laws in your jurisdiction.
 The authors accept no liability for misuse.
 
----
-
-## 🛠️ Built With
-
-- [PySide6](https://doc.qt.io/qtforpython/) — native Qt GUI
-- [requests](https://docs.python-requests.org/) / [urllib3](https://urllib3.readthedocs.io/) — HTTP networking
-- [cryptography](https://cryptography.io/) — X.509 certificate parsing
-- [validators](https://github.com/python-validators/validators) — URL validation
-- [BeautifulSoup4](https://www.crummy.com/software/BeautifulSoup/) — light HTML parsing for fingerprinting
-
----
-
-## 📄 License
+## License
 
 Released under the [MIT License](LICENSE).
 
-## 🤝 Contributing
+## Acknowledgements
 
-Pull requests are welcome! The header knowledge base
-(`scanner/header_definitions.py`), fingerprinting signatures
-(`scanner/fingerprint.py`), and scoring model (`scanner/scoring.py`) are all
-designed to be easily extended — see the module docstrings for guidance.
+Guidance and reference material from
+[OWASP Secure Headers Project](https://owasp.org/www-project-secure-headers/),
+[MDN HTTP Headers documentation](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
+and the Mozilla HTTP Observatory.
